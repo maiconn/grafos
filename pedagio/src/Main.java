@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.Queue;
 
 /**
-*
-* @author Maicon Machado Gerardi da Silva
-* @author Débora Ghilardi
-*/
+ *
+ * @author Maicon Machado Gerardi da Silva
+ * @author Débora Ghilardi
+ */
 class Nodo {
 
 	private Integer nome;
@@ -30,7 +30,7 @@ class Nodo {
 	public int quantidadeDeFilhos() {
 		return filhos.size();
 	}
-	
+
 	public List<Nodo> getFilhos() {
 		return filhos;
 	}
@@ -47,72 +47,72 @@ class Grafo {
 	private static final int PRETO = 2;
 	private static final int NIL = -1;
 	private static final int INFINIT = Integer.MAX_VALUE;
-	private Map<Integer, Nodo> NodoPedagios;
+	private Map<Integer, Nodo> nodos;
 
 	public Grafo() {
-		NodoPedagios = new HashMap<Integer, Nodo>();
+		nodos = new HashMap<Integer, Nodo>();
 	}
 
-	public Nodo adicionarNodoPedagio(Nodo nodoPedagio) {
-		NodoPedagios.put(nodoPedagio.getNome(), nodoPedagio);
-		return NodoPedagios.get(nodoPedagio.getNome());
+	public Nodo adicionarNodo(Nodo nodo) {
+		nodos.put(nodo.getNome(), nodo);
+		return nodos.get(nodo.getNome());
 	}
 
 	public void criarAresta(Integer nomeNodoPedagio1, Integer nomeNodoPedagio2) {
-		Nodo NodoPedagio1 = NodoPedagios.get(nomeNodoPedagio1);
-		Nodo NodoPedagio2 = NodoPedagios.get(nomeNodoPedagio2);
+		Nodo NodoPedagio1 = nodos.get(nomeNodoPedagio1);
+		Nodo NodoPedagio2 = nodos.get(nomeNodoPedagio2);
 
 		NodoPedagio1.adicionarFilho(NodoPedagio2);
 		NodoPedagio2.adicionarFilho(NodoPedagio1);
 	}
-	
-	public String nodosQuePossoChegar(Integer nodoInicial, int nivel){
-		ArrayList<Integer> listaAlcancada = new ArrayList<Integer>();
-		
-		int size= NodoPedagios.size() + 1;
+
+	public String nodosQuePossoChegar(Integer nodoInicial, int nivel) {
+		ArrayList<Integer> listaCidades = new ArrayList<Integer>();
+
+		int size = nodos.size() + 1;
 		int[] cor = new int[size];
 		int[] pai = new int[size];
 		int[] distancia = new int[size];
-		
-		for(int i = 1 ; i < size ; i++){
+
+		for (int i = 1; i < size; i++) {
 			cor[i] = BRANCO;
 			pai[i] = NIL;
 			distancia[i] = INFINIT;
 		}
-		
+
 		distancia[nodoInicial] = 0;
 		cor[nodoInicial] = CINZA;
-		
+
 		Queue<Integer> fila = new LinkedList<Integer>();
 		fila.add(nodoInicial);
-		
-		while(!fila.isEmpty()){
+
+		while (!fila.isEmpty()) {
 			int u = fila.remove();
-			for(Nodo filhos : NodoPedagios.get(u).getFilhos()){
+			for (Nodo filhos : nodos.get(u).getFilhos()) {
 				int filho = filhos.getNome();
-				if(cor[filho] == BRANCO){
+				if (cor[filho] == BRANCO) {
 					fila.add(filho);
 					cor[filho] = CINZA;
 					pai[filho] = u;
 					distancia[filho] = distancia[u] + 1;
-					
-					if(distancia[filho]  <= nivel){
-						listaAlcancada.add(filho);
+
+					if (distancia[filho] <= nivel) {
+						listaCidades.add(filho);
 					}
 				}
 			}
 			cor[u] = PRETO;
 		}
-		
-		Collections.sort(listaAlcancada);
-		
+
+		Collections.sort(listaCidades);
+
 		StringBuilder str = new StringBuilder();
-		
-		for(Integer nodo : listaAlcancada){
+
+		for (Integer nodo : listaCidades) {
 			str.append(nodo);
 			str.append(" ");
 		}
-		
+
 		return str.toString().trim();
 	}
 }
@@ -120,45 +120,33 @@ class Grafo {
 public class Main {
 	public static void main(String[] args) throws Exception {
 		BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
-		StringBuilder resultado = new StringBuilder();
-		
+
 		int contador = 1;
-		
-		while(true){
+		while (true) {
 			String CELP[] = teclado.readLine().split(" ");
-			
+
 			int cidades = Integer.parseInt(CELP[0]);
 			int estradas = Integer.parseInt(CELP[1]);
 			int localicazacao = Integer.parseInt(CELP[2]);
-			int pedagios = Integer.parseInt(CELP[3]);		
-			
-			if(cidades == 0 && estradas == 0 && localicazacao == 0 && pedagios == 0){
+			int pedagios = Integer.parseInt(CELP[3]);
+
+			if (cidades == 0 && estradas == 0 && localicazacao == 0 && pedagios == 0) {
 				break;
 			}
-			
+
 			Grafo grafo = new Grafo();
-			for(int i = 1 ; i<= cidades ; i++){
-				grafo.adicionarNodoPedagio(new Nodo(i));
+
+			for (int i = 1; i <= cidades; i++) {
+				grafo.adicionarNodo(new Nodo(i));
 			}
-			
-			for(int i = 0; i<estradas ; i++){
+
+			for (int i = 0; i < estradas; i++) {
 				String estrada[] = teclado.readLine().split(" ");
-				
-				int rota1 = Integer.parseInt(estrada[0]);
-				int rota2 = Integer.parseInt(estrada[1]);
-				
-				grafo.criarAresta(rota1, rota2);
+				grafo.criarAresta(Integer.parseInt(estrada[0]), Integer.parseInt(estrada[1]));
 			}
-			
-			resultado.append("Teste ");
-			resultado.append(contador++);
-			resultado.append(System.getProperty("line.separator"));
-			resultado.append(grafo.nodosQuePossoChegar(localicazacao, pedagios));
-			resultado.append(System.getProperty("line.separator"));
-			resultado.append(System.getProperty("line.separator"));
+
+			System.out.printf("Teste %d\n%s\n\n", contador++, grafo.nodosQuePossoChegar(localicazacao, pedagios));
 		}
-		
-		System.out.println(resultado.toString());
 	}
 
 }

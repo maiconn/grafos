@@ -1,0 +1,75 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+/**
+ *
+ * @author Maicon Machado Gerardi da Silva
+ * @author Débora Ghilardi
+ */
+class Grafo {
+	private int[] incidencia;
+
+	public Grafo(int qtdNodos) {
+		incidencia = new int[qtdNodos];
+	}
+
+	public void criarAresta(int nodo1, int nodo2) {
+		incidencia[nodo1 - 1]++;
+		incidencia[nodo2 - 1]++;
+	}
+
+	public String nodosComMaiorQuantidadeDeFilhos() {
+		StringBuilder maioreStr = new StringBuilder();
+		int maior = -1;
+		for (int i = 0; i < incidencia.length; i++) {
+			if (incidencia[i] > maior) {
+				maior = incidencia[i];
+				maioreStr = new StringBuilder();
+				maioreStr.append(" " + (i + 1));
+			} else if (incidencia[i] == maior) {
+				maioreStr.append(" " + (i + 1));
+			}
+		}
+
+		return maioreStr.toString().trim();
+	}
+}
+
+public class Main {
+	public static void main(String[] args) throws Exception {
+		BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
+		// BufferedReader teclado = new BufferedReader(new
+		// FileReader("C:\\teste.txt"));
+		StringBuilder resultado = new StringBuilder();
+
+		int contador = 1;
+		while (true) {
+
+			String[] aeroportosEvoos = teclado.readLine().split(" ");
+
+			int aeroportos = Integer.parseInt(aeroportosEvoos[0]);
+			int voos = Integer.parseInt(aeroportosEvoos[1]);
+
+			if (aeroportos == 0 && voos == 0) {
+				break;
+			}
+
+			Grafo grafo = new Grafo(aeroportos);
+
+			for (int i = 0; i < voos; i++) {
+				String[] rota = teclado.readLine().split(" ");
+				grafo.criarAresta(Integer.parseInt(rota[0]), Integer.parseInt(rota[1]));
+			}
+
+			resultado.append("Teste ");
+			resultado.append(contador++);
+			resultado.append(System.getProperty("line.separator"));
+			resultado.append(grafo.nodosComMaiorQuantidadeDeFilhos());
+			resultado.append(System.getProperty("line.separator"));
+			resultado.append(System.getProperty("line.separator"));
+		}
+
+		System.out.println(resultado.toString());
+	}
+
+}

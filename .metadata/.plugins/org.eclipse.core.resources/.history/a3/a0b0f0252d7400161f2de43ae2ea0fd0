@@ -1,0 +1,164 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ *
+ * @author Maicon Machado Gerardi da Silva
+ * @author Débora Ghilardi
+ */
+class InsertionSort {
+    public static <T extends Comparable<T>> void sort(T[] array) {
+        for (int i = 1; i < array.length; i++) {
+            T item = array[i];
+            int indexHole = i;
+            while (indexHole > 0 && array[indexHole - 1].compareTo(item) > 0) {
+                array[indexHole] = array[--indexHole];
+            }
+            array[indexHole] = item;
+        }
+    }
+}
+
+class BucketSort {
+	private static final int DEFAULT_BUCKET_SIZE = 5;
+
+	public static void sort(Integer[] array) {
+		sort(array, DEFAULT_BUCKET_SIZE);
+	}
+
+	public static void sort(Integer[] array, int bucketSize) {
+		if (array.length == 0) {
+			return;
+		}
+
+		// Determine minimum and maximum values
+		Integer minValue = array[0];
+		Integer maxValue = array[0];
+		for (int i = 1; i < array.length; i++) {
+			if (array[i] < minValue) {
+				minValue = array[i];
+			} else if (array[i] > maxValue) {
+				maxValue = array[i];
+			}
+		}
+
+		// Initialise buckets
+		int bucketCount = (maxValue - minValue) / bucketSize + 1;
+		List<List<Integer>> buckets = new ArrayList<List<Integer>>(bucketCount);
+		for (int i = 0; i < bucketCount; i++) {
+			buckets.add(new ArrayList<Integer>());
+		}
+
+		// Distribute input array values into buckets
+		for (int i = 0; i < array.length; i++) {
+			buckets.get((array[i] - minValue) / bucketSize).add(array[i]);
+		}
+
+		// Sort buckets and place back into input array
+		int currentIndex = 0;
+		for (int i = 0; i < buckets.size(); i++) {
+			Integer[] bucketArray = new Integer[buckets.get(i).size()];
+			bucketArray = buckets.get(i).toArray(bucketArray);
+			InsertionSort.sort(bucketArray);
+			for (int j = 0; j < bucketArray.length; j++) {
+				array[currentIndex++] = bucketArray[j];
+			}
+		}
+	}
+}
+
+class Grafo {
+	private int[] incidencia;
+
+	private int maior = -1;
+	private List<Integer> maiores = new ArrayList<Integer>();
+
+	public Grafo(int qtdNodos) {
+		incidencia = new int[qtdNodos];
+	}
+
+	public void criarAresta(Integer nodo1, Integer nodo2) {
+		incidencia[nodo1 - 1]++;
+		incidencia[nodo2 - 1]++;
+
+		if (incidencia[nodo1 - 1] > maior) {
+			maior = incidencia[nodo1 - 1];
+			maiores.clear();
+			maiores.add(nodo1);
+		} else if (incidencia[nodo1 - 1] == maior) {
+			maiores.add(nodo1);
+		}
+
+		if (incidencia[nodo2 - 1] > maior) {
+			maior = incidencia[nodo2 - 1];
+			maiores.clear();
+			maiores.add(nodo2);
+		} else if (incidencia[nodo2 - 1] == maior) {
+			maiores.add(nodo2);
+		}
+	}
+
+	public String nodosComMaiorQuantidadeDeFilhos() {
+		Collections.sort(maiores);
+
+		StringBuilder maioreStr = new StringBuilder();
+		for (Integer str : maiores) {
+			maioreStr.append(str.toString());
+			maioreStr.append(" ");
+		}
+
+		return maioreStr.toString().trim();
+	}
+}
+
+public class Main {
+	public static void main(String[] args) throws Exception {
+		BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
+		// BufferedReader teclado = new BufferedReader(new
+		// FileReader("C:\\teste.txt"));
+		StringBuilder resultado = new StringBuilder();
+
+		int contador = 1;
+		while (true) {
+
+			String[] aeroportosEvoos = teclado.readLine().split(" ");
+
+			int aeroportos = Integer.parseInt(aeroportosEvoos[0]);
+			int voos = Integer.parseInt(aeroportosEvoos[1]);
+
+			if (aeroportos == 0 && voos == 0) {
+				break;
+			}
+
+			Grafo grafo = new Grafo(aeroportos);
+
+			if (aeroportos == 1 && voos == 0) {
+				resultado.append("Teste ");
+				resultado.append(contador++);
+				resultado.append(System.getProperty("line.separator"));
+				resultado.append(" ");
+				resultado.append(System.getProperty("line.separator"));
+				resultado.append(System.getProperty("line.separator"));
+				continue;
+			}
+
+			for (int i = 0; i < voos; i++) {
+				String[] rota = teclado.readLine().split(" ");
+				grafo.criarAresta(Integer.parseInt(rota[0]), Integer.parseInt(rota[1]));
+			}
+
+			resultado.append("Teste ");
+			resultado.append(contador++);
+			resultado.append(System.getProperty("line.separator"));
+			resultado.append(grafo.nodosComMaiorQuantidadeDeFilhos());
+			resultado.append(System.getProperty("line.separator"));
+			resultado.append(System.getProperty("line.separator"));
+		}
+
+		System.out.println(resultado.toString());
+	}
+
+}

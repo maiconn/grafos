@@ -1,0 +1,171 @@
+package duende;
+
+import java.io.File;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+/**
+ *
+ * @author Maicon Machado Gerardi da Silva
+ * @author Débora Ghilardi
+ */
+class Grafo {
+	private static final int BRANCO = 0;
+	private static final int CINZA = 1;
+	private static final int PRETO = 2;
+	private static final int NIL = -1;
+
+	public static int SAIDA = 0;
+	public static int SEM_SAIDA = 1;
+	public static int CRISTAL = 2;
+	public static int DUENDE = 3;
+	private static final int INFINIT = Integer.MAX_VALUE;
+
+	private int[][] matriz;
+	private int x, y;
+	private int xDuende = -1, yDuende = -1;
+
+	public Grafo(int x, int y) {
+		this.x = x;
+		this.y = y;
+		matriz = new int[x][y];
+	}
+
+	public void receberValores(int x, int[] valores) throws Exception {
+		matriz[x] = valores;
+	}
+
+	public void atribuirDuende(int x, int y) {
+		xDuende = x;
+		yDuende = y;
+	}
+
+	public int quantidadeMenorCaminho() {
+		int[][] cor = new int[x][y];
+		int[][] pai = new int[x][y];
+		int[][] distancia = new int[x][y];
+
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[i].length; j++) {
+				int val = matriz[i][j];
+				if (val == CRISTAL) {
+					cor[i][j] = PRETO;
+				} else {
+					cor[i][j] = BRANCO;
+				}
+				pai[i][j] = NIL;
+				distancia[i][j] = INFINIT;
+			}
+		}
+
+		distancia[xDuende][yDuende] = 0;
+		cor[xDuende][yDuende] = CINZA;
+
+		Queue<String> fila = new LinkedList<String>();
+		fila.add(xDuende + " " + yDuende);
+
+		int menorCaminho = Integer.MAX_VALUE;
+		while (!fila.isEmpty()) {
+			String[] u = fila.remove().split(" ");
+			int xAtual = Integer.parseInt(u[0]);
+			int yAtual = Integer.parseInt(u[1]);
+
+			// direita
+			try {
+				int proxY = (yAtual - 1);
+				if (cor[xAtual][proxY] == BRANCO) {
+					cor[xAtual][proxY] = CINZA;
+					distancia[xAtual][proxY] = distancia[xAtual][yAtual] + 1;
+					fila.add(xAtual + " " + proxY);
+				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+
+			}
+
+			// esquerda
+			try {
+				int proxY = (yAtual + 1);
+				if (cor[xAtual][proxY] == BRANCO) {
+					cor[xAtual][proxY] = CINZA;
+					distancia[xAtual][proxY] = distancia[xAtual][yAtual] + 1;
+					fila.add(xAtual + " " + proxY);
+				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+
+			}
+
+			// cima
+			try {
+				int proxX = (xAtual - 1);
+				if (cor[proxX][yAtual] == BRANCO) {
+					cor[proxX][yAtual] = CINZA;
+					distancia[proxX][yAtual] = distancia[xAtual][yAtual] + 1;
+					fila.add(proxX + " " + yAtual);
+				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+
+			}
+
+			// baixo
+			try {
+				int proxX = (xAtual + 1);
+				if (cor[proxX][yAtual] == BRANCO) {
+					cor[proxX][yAtual] = CINZA;
+					distancia[proxX][yAtual] = distancia[xAtual][yAtual] + 1;
+					fila.add(proxX + " " + yAtual);
+				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+
+			}
+
+			if (matriz[xAtual][yAtual] == SAIDA) {
+				if (distancia[xAtual][yAtual] < menorCaminho) {
+					menorCaminho = distancia[xAtual][yAtual];
+				}
+			}
+
+			cor[xAtual][yAtual] = PRETO;
+		}
+
+		return menorCaminho;
+	}
+
+}
+
+public class Main {
+
+	public static void main(String[] args) throws Exception {
+//		Scanner scan = new Scanner(System.in);
+		Scanner scan = new Scanner(new File("C:\\teste.txt"));
+
+		int x = scan.nextInt();
+		int y = scan.nextInt();
+
+		Grafo grafo = new Grafo(x, y);
+
+		int[][] matrix = new int[x][y];
+		
+		for(int i = 0 ; i < matrix.length ; i++){
+			for(int j = 0 ; j < matrix[i].length ; j++){
+				matrix[i][j] = scan.nextInt();
+			}	
+		}
+		
+		for (int i = 0; i < x; i++) {
+			String[] linha = scan.nextLine().split(" ");
+			int[] valores = new int[linha.length];
+			for (int m = 0; m < linha.length; m++) {
+				valores[m] = Integer.parseInt(linha[m]);
+
+				if (valores[m] == Grafo.DUENDE) {
+					grafo.atribuirDuende(i, m);
+				}
+			}
+
+			grafo.receberValores(i, valores);
+		}
+
+		System.out.println(grafo.quantidadeMenorCaminho());
+	}
+}

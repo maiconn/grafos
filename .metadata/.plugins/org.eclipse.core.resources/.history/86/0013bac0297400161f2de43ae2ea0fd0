@@ -1,0 +1,116 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ *
+ * @author Maicon Machado Gerardi da Silva
+ * @author Débora Ghilardi
+ */
+class Grafo {
+	private int[][] incidencia;
+
+	public Grafo(int qtdNodos) {
+		incidencia = new int[qtdNodos][qtdNodos];
+	}
+
+	public void criarAresta(Integer nodo1, Integer nodo2) {
+		int x = nodo1 - 1;
+		int y = nodo2 - 1;
+
+		incidencia[x][y]++;
+		incidencia[y][x]++;
+	}
+
+	public String nodosComMaiorQuantidadeDeFilhos() {
+		List<Integer> maiores = new ArrayList<Integer>();
+
+		int maiorQtdFilhos = -1;
+		for (int i = 0; i < incidencia.length; i++) {
+			for (int j = i + 1; j < incidencia[i].length; j++) {
+				if (incidencia[i][j] > maiorQtdFilhos) {
+					maiorQtdFilhos = incidencia[i][j];
+					maiores.clear();
+					maiores.add(i);
+				} else if (incidencia[i][j] == maiorQtdFilhos) {
+					maiores.add(i);
+				}
+			}
+		}
+
+		Collections.sort(maiores);
+
+		StringBuilder maioreStr = new StringBuilder();
+		for (Integer str : maiores) {
+			maioreStr.append(str.toString());
+			maioreStr.append(" ");
+		}
+
+		return maioreStr.toString().trim();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder str = new StringBuilder();
+		for (int i = 0; i < incidencia.length; i++) {
+			str.append("[ ");
+			for (int j = 0; i < incidencia[i].length; j++) {
+				str.append(incidencia[i][j]);
+				str.append(",");
+			}
+			str.append("]\n");
+		}
+		return str.toString();
+	}
+}
+
+public class Main {
+	public static void main(String[] args) throws Exception {
+		// BufferedReader teclado = new BufferedReader(new
+		// InputStreamReader(System.in));
+		BufferedReader teclado = new BufferedReader(new FileReader("C:\\teste.txt"));
+		StringBuilder resultado = new StringBuilder();
+
+		int contador = 1;
+		while (true) {
+
+			String[] aeroportosEvoos = teclado.readLine().split(" ");
+
+			int aeroportos = Integer.parseInt(aeroportosEvoos[0]);
+			int voos = Integer.parseInt(aeroportosEvoos[1]);
+
+			if (aeroportos == 0 && voos == 0) {
+				break;
+			}
+
+			Grafo grafo = new Grafo(aeroportos);
+
+			if (aeroportos == 1 && voos == 0) {
+				resultado.append("Teste ");
+				resultado.append(contador++);
+				resultado.append(System.getProperty("line.separator"));
+				resultado.append(" ");
+				resultado.append(System.getProperty("line.separator"));
+				resultado.append(System.getProperty("line.separator"));
+				continue;
+			}
+
+			for (int i = 0; i < voos; i++) {
+				String[] rota = teclado.readLine().split(" ");
+				grafo.criarAresta(Integer.parseInt(rota[0]), Integer.parseInt(rota[1]));
+			}
+
+			resultado.append("Teste ");
+			resultado.append(contador++);
+			resultado.append(System.getProperty("line.separator"));
+			resultado.append(grafo.nodosComMaiorQuantidadeDeFilhos());
+			resultado.append(System.getProperty("line.separator"));
+			resultado.append(System.getProperty("line.separator"));
+		}
+
+		System.out.println(resultado.toString());
+	}
+
+}
